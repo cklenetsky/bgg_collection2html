@@ -1,10 +1,10 @@
-# bgg_collection2pdf 
+# bgg_collection2html 
 
-Create a pdf file of your game lists on Board Game Geek
+Create html of your game lists on Board Game Geek
 
 ## Description
 
-This is a python script that will generate a HTML  (PDF as an extra step) catalog for your board game collection. Currently the output can be in the form of pages or card images of the games in your collection.
+This is a python script that will generate an HTML (PDF as an extra step) catalog for your board game collection. Currently the output can be in the form of pages or card images of the games in your collection.
 
 ### Dependencies
 
@@ -56,6 +56,7 @@ Print with no margins on US Letter paper. Make sure you enable "Print Background
 
 Contributors names and contact info
 
+* Carey Klenetsky, forked from Daniel Shourd's bgg_collection2pdf
 * Daniel Shourd
 ** [on BGG](https://boardgamegeek.com/user/RKDN)
 ** [here on github](https://github.com/RKDN)
