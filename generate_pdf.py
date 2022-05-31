@@ -182,13 +182,18 @@ def get_description_length(config):
     else:
         return 1000
 
-def template_to_output_entry(config, game_info):
+def template_to_output_entry(config, game_info, anchor):
     mechanics_list_max_length = get_mechanics_list_max_length(config)
 
     #Read the template.
     template = open_template(config)
 
     #Replace values in the template.
+    if (anchor):
+        template = template.replace('{{anchor}}'    , 'id="' + anchor + '"')
+    else:
+        template = template.replace('{{anchor}}'    , "")
+
     if(config.no_cache):
         template = template.replace('{{image}}'     , game_info.image or "")
     else:
@@ -224,11 +229,16 @@ def download_image(config, game_info):
         #If we have a local cache of the image, then don't try to redownload it, use the local copy.
         if(os.path.exists(os.path.join(config.images_path, game_info.obj_id + ".jpg")) == False):
             #Download the image to the local cache.
+            if (game_info.image is None):
+                logging.warning(game_info.name + " has no image url")
+                game_info.image = "https://cf.geekdo-images.com/zxVVmggfpHJpmnJY9j-k1w__imagepagezoom/img/RO6wGyH4m4xOJWkgv6OVlf6GbrA=/fit-in/1200x900/filters:no_upscale():strip_icc()/pic1657689.jpg"
             res = requests.get(game_info.image, stream = True)
             if res.status_code == 200:
                 logging.info("Writing: " + collection_info.game_name + " boxart to " + os.path.join(config.images_path, game_info.obj_id + ".jpg"))
                 with open(os.path.join(config.images_path, game_info.obj_id + ".jpg"), 'wb') as f:
                     shutil.copyfileobj(res.raw, f)
+            else:
+                logging.error("Error downloading image: " + game_info.image + ", status=" + res.status_code)
 
 def break_if_required(file, line_text, do_break):
     if(do_break):
@@ -432,6 +442,9 @@ items = read_collection(config)
 
 find_and_download_new_collection_object_info(config, items)
 
+firstchar = '-'
+anchor = ""
+
 #Parsing user collection XML
 for item in items:
     collection_info = collection_information(item, config)
@@ -458,8 +471,15 @@ for item in items:
         #Now that we have all of the information we need, create the HTML page.
         if(thisgameitems.attrib['type'] == "boardgame"):
             game_info = game_information(thisgameitems, config, collection_info)
+            newfirstchar = game_info.name[0]
+            if (newfirstchar.isdigit()):
+                newfirstchar = '0'
+            if (newfirstchar != firstchar):
+                firstchar = newfirstchar
+                anchor = firstchar
             download_image(config, game_info)
-            template_to_output_entry(config, game_info)
+            template_to_output_entry(config, game_info, anchor)
+            anchor = ""
             gather_index_info(config, game_info, thisgameitems)
 
 #Write the index.
