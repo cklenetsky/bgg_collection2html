@@ -56,6 +56,23 @@
 
 .navigation {
     text-align: center;
+    color: LightGrey;
+}
+
+.navigation_link:link {
+    text-decoration: none;
+    color: DarkSlateGrey;
+}
+
+.navigation_link:visited {
+    text-decoration: none;
+    color: DarkSlateGrey;
+}
+
+.navigation_link:hover {
+    text-decoration: underline;
+    font-weight: bold;
+    color: CornflowerBlue;
 }
 
 .description {

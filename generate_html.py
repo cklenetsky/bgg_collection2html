@@ -319,9 +319,9 @@ def write_output_navigation(config, firstchars):
         file.write('<h2 class="Navigation">')
         for c, present in firstchars.items():
             if (present == 1):
-                file.write('<a href="#'+c+'"> '+c+' </a> ')
+                file.write('&nbsp;<a class="Navigation_Link" href="#'+c+'">'+c+'</a>&nbsp; ')
             else:
-                file.write(' '+c+'  ')
+                file.write('&nbsp;'+c+'&nbsp; ')
         file.write('</h2>\n')
 
 def request_collection(config):        
