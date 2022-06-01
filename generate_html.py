@@ -12,6 +12,7 @@ import logging
 from urllib.parse import urlencode, quote
 from datetime import datetime
 import contextlib
+import pprint
 
 starttime = datetime.now()
 ######### Begin Classes #########
@@ -464,7 +465,7 @@ def parse_name_start(name):
     for article in articles:
         if (name.startswith(article)):
             therest = name[len(article):]
-            if (therest[0]):
+            if (therest[0].isspace()):
                 return therest.lstrip()
     return name
 
@@ -551,16 +552,99 @@ firstchars = {
     'Y': 0,
     'Z': 0
 }
-iterate_items(config, items, determine_first_chars, firstchars)
+
+pp = pprint.PrettyPrinter(indent=4)
+
+for item in items:
+    collection_info = collection_information(item, config)
+
+    #Grab only games we own unless own isn't set.
+    if(config.only_own == False or collection_info.own):
+        #Check to see if the XML already exists. If it does, don't re-request it.
+        if(os.path.exists(collection_info.game_xml) and not config.no_cache):
+            with open(collection_info.game_xml, 'r', encoding="utf-8") as file:
+                thisgameitems = ElementTree.fromstring(file.read())
+                for child in thisgameitems:
+                    if (child.tag == "item"):
+                        thisgameitems=child
+                        break
+        elif not (config.no_cache):
+                logging.error('game not found: ' + collection_info.game_xml)
+                #Pull the game info XML
+                game_info_response = bgg_getter('thing', {'id': collection_info.obj_id, 'stats': 1} , config)
+
+                #Write out the game info XML.
+                with open(collection_info.game_xml, 'w', encoding="utf-8") as file:
+                    logging.info("Writing: " + collection_info.game_name + " to " + collection_info.game_xml)
+                    file.write(game_info_response.text)
+                    thisgameitems = ElementTree.fromstring(game_info_response.content)
+                    for child in thisgameitems:
+                        if (child.tag == "item"):
+                            thisgameitems=child
+                            break
+        else:
+            thisgameitems = config.dict_game_info[collection_info.obj_id]
+
+        #Now that we have all of the information we need, create the HTML page.
+        if(collection_info.game_name is not None):
+            normalized_name = parse_name_start(collection_info.game_name)
+            c = normalized_name[0]
+            if (c.isdigit()):
+                c = '0'
+            firstchars[c] = 1 
+
 
 write_output_navigation(config, firstchars)
 
 find_and_download_new_collection_object_info(config, items)
 
-firstchar = '-'
-anchor = ""
 
-iterate_items(config, items, write_game_info, firstchars)
+for item in items:
+    collection_info = collection_information(item, config)
+
+    #Grab only games we own unless own isn't set.
+    if(config.only_own == False or collection_info.own):
+        #Check to see if the XML already exists. If it does, don't re-request it.
+        if(os.path.exists(collection_info.game_xml) and not config.no_cache):
+            with open(collection_info.game_xml, 'r', encoding="utf-8") as file:
+                thisgameitems = ElementTree.fromstring(file.read())
+                for child in thisgameitems:
+                    if (child.tag == "item"):
+                        thisgameitems=child
+                        break
+        elif not (config.no_cache):
+                logging.error('game not found')
+                #Pull the game info XML
+                game_info_response = bgg_getter('thing', {'id': collection_info.obj_id, 'stats': 1} , config)
+
+                #Write out the game info XML.
+                with open(collection_info.game_xml, 'w', encoding="utf-8") as file:
+                    logging.info("Writing: " + collection_info.game_name + " to " + collection_info.game_xml)
+                    file.write(game_info_response.text)
+                    thisgameitems = ElementTree.fromstring(game_info_response.content)
+                    for child in thisgameitems:
+                        if (child.tag == "item"):
+                            thisgameitems=child
+                            break
+        else:
+            thisgameitems = config.dict_game_info[collection_info.obj_id]
+
+        #Now that we have all of the information we need, create the HTML page.
+        if(thisgameitems.attrib['type'] == "boardgame"):
+            game_info = game_information(thisgameitems, config, collection_info)
+            normalized_name = parse_name_start(game_info.name)
+            newfirstchar = normalized_name[0]
+            anchor = ""
+            if (newfirstchar.isdigit()):
+                newfirstchar = '0'
+            if (firstchars[newfirstchar] == 1):
+                anchor = newfirstchar
+            download_image(config, game_info)
+            template_to_output_entry(config, game_info, anchor)
+            gather_index_info(config, game_info, thisgameitems)
+            firstchars[newfirstchar] = 0
+
+
 #Write the index.
 write_index(config)
 
