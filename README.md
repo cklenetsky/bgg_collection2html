@@ -20,7 +20,7 @@ This is a python script that will generate an HTML (PDF as an extra step) catalo
 
 * How to run the program
 ```
-python generate_pdf.py --username USER
+python generate_html.py --username USER
 ```
 Wait for the script to run. It will take a bit to download all of the information needed from BGG.
 
