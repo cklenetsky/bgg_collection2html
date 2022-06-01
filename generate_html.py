@@ -82,6 +82,17 @@ class game_information:
 
 ######### End Classes #########
 
+######### Begin Globals #########
+
+articles = [
+"The",
+"A",
+"Le"
+]
+
+######### End Globals #########
+
+
 ######### Begin Functions #########
 
 #command is an api command from BGG (user, collection, etc)
@@ -302,6 +313,16 @@ def write_output_header(config):
             else:
                 file.write('<html><head><link href="style.css" rel="stylesheet" type="text/css"></head><body>')
 
+def write_output_navigation(config, firstchars):
+    with open(config.output, 'a') as file:
+        file.write('<h2 class="Navigation">')
+        for c, present in firstchars.items():
+            if (present == 1):
+                file.write('<a href="#'+c+'"> '+c+' </a> ')
+            else:
+                file.write(' '+c+'  ')
+        file.write('</h2>\n')
+
 def request_collection(config):        
     logging.warning('Reading collection from bgg')
 
@@ -412,6 +433,66 @@ def write_output_trailer(config):
     with open(config.output, 'a') as file:
             file.write("</body></html>")
 
+
+def iterate_items(config, items, peritemfunc, peritemparam1=None, peritemparam2=None):
+    for item in items:
+        collection_info = collection_information(item, config)
+
+        #Grab only games we own unless own isn't set.
+        if(config.only_own == False or collection_info.own):
+            #Check to see if the XML already exists. If it does, don't re-request it.
+            if(os.path.exists(collection_info.game_xml) and not config.no_cache):
+                with open(collection_info.game_xml, 'r', encoding="utf-8") as file:
+                    thisgameitems = ElementTree.fromstring(file.read())
+            elif not (config.no_cache):
+                    logging.error('game not found')
+                    #Pull the game info XML
+                    game_info_response = bgg_getter('thing', {'id': collection_info.obj_id, 'stats': 1} , config)
+                
+                    #Write out the game info XML.
+                    with open(collection_info.game_xml, 'w', encoding="utf-8") as file:
+                        logging.info("Writing: " + collection_info.game_name + " to " + collection_info.game_xml)
+                        file.write(game_info_response.text)
+                        thisgameitems = ElementTree.fromstring(game_info_response.content)
+            else:
+                thisgameitems = config.dict_game_info[collection_info.obj_id]
+
+            #Now that we have all of the information we need, call the function passed in
+            peritemfunc(collection_info, thisgameitems, config, peritemparam1)
+
+def parse_name_start(name):
+    for article in articles:
+        if (name.startswith(article)):
+            therest = name[len(article):]
+            if (therest[0]):
+                return therest.lstrip()
+    return name
+
+
+def determine_first_chars(collection_info, thisgameitems, config, firstchars):
+    if(collection_info.game_name is not None):
+        normalized_name = parse_name_start(collection_info.game_name)
+        c = normalized_name[0]
+        if (c.isdigit()):
+            c = '0'
+        firstchars[c] = 1 
+
+
+def write_game_info(collection_info, thisgameitems, config, towrite):
+    if(thisgameitems.attrib['type'] == "boardgame"):
+        game_info = game_information(thisgameitems, config, collection_info)
+        normalized_name = parse_name_start(game_info.name)
+        newfirstchar = normalized_name[0]
+        anchor = ""
+        if (newfirstchar.isdigit()):
+            newfirstchar = '0'
+        if (towrite[newfirstchar] == 1):
+            anchor = newfirstchar
+        download_image(config, game_info)
+        template_to_output_entry(config, game_info, anchor)
+        gather_index_info(config, game_info, thisgameitems)
+        towrite[newfirstchar] = 0
+
 ######### End Functions #########
 
 #Get arguments.
@@ -440,48 +521,46 @@ write_output_header(config)
 #Read in the collection xml file.
 items = read_collection(config)
 
+#Build the jump-to list
+firstchars = {
+    '0': 0,
+    'A': 0,
+    'B': 0,
+    'C': 0,
+    'D': 0,
+    'E': 0,
+    'F': 0,
+    'G': 0,
+    'H': 0,
+    'I': 0,
+    'J': 0,
+    'K': 0,
+    'L': 0,
+    'M': 0,
+    'N': 0,
+    'O': 0,
+    'P': 0,
+    'Q': 0,
+    'R': 0,
+    'S': 0,
+    'T': 0,
+    'U': 0,
+    'V': 0,
+    'W': 0,
+    'X': 0,
+    'Y': 0,
+    'Z': 0
+}
+iterate_items(config, items, determine_first_chars, firstchars)
+
+write_output_navigation(config, firstchars)
+
 find_and_download_new_collection_object_info(config, items)
 
 firstchar = '-'
 anchor = ""
 
-#Parsing user collection XML
-for item in items:
-    collection_info = collection_information(item, config)
-
-    #Grab only games we own unless own isn't set.
-    if(config.only_own == False or collection_info.own):
-        #Check to see if the XML already exists. If it does, don't re-request it.
-        if(os.path.exists(collection_info.game_xml) and not config.no_cache):
-            with open(collection_info.game_xml, 'r', encoding="utf-8") as file:
-                thisgameitems = ElementTree.fromstring(file.read())
-        elif not (config.no_cache):
-                logging.error('game not found')
-                #Pull the game info XML
-                game_info_response = bgg_getter('thing', {'id': collection_info.obj_id, 'stats': 1} , config)
-                
-                #Write out the game info XML.
-                with open(collection_info.game_xml, 'w', encoding="utf-8") as file:
-                    logging.info("Writing: " + collection_info.game_name + " to " + collection_info.game_xml)
-                    file.write(game_info_response.text)
-                    thisgameitems = ElementTree.fromstring(game_info_response.content)
-        else:
-            thisgameitems = config.dict_game_info[collection_info.obj_id]
-
-        #Now that we have all of the information we need, create the HTML page.
-        if(thisgameitems.attrib['type'] == "boardgame"):
-            game_info = game_information(thisgameitems, config, collection_info)
-            newfirstchar = game_info.name[0]
-            if (newfirstchar.isdigit()):
-                newfirstchar = '0'
-            if (newfirstchar != firstchar):
-                firstchar = newfirstchar
-                anchor = firstchar
-            download_image(config, game_info)
-            template_to_output_entry(config, game_info, anchor)
-            anchor = ""
-            gather_index_info(config, game_info, thisgameitems)
-
+iterate_items(config, items, write_game_info, firstchars)
 #Write the index.
 write_index(config)
 

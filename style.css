@@ -54,6 +54,10 @@
     -moz-box-shadow: 9px 9px 17px -1px rgba(0,0,0,0.32);
 }
 
+.navigation {
+    text-align: center;
+}
+
 .description {
     padding-left: 10px;
     padding-right: 10px;
