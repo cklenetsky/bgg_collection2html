@@ -54,7 +54,26 @@
     -moz-box-shadow: 9px 9px 17px -1px rgba(0,0,0,0.32);
 }
 
+#navbar {
+    left: 50%;
+    transform: translate(-50%, 0);
+    margin-top: auto;
+    margin-bottom: auto;
+    color: white;
+    position: fixed;
+    width: 75%;
+    display: block;
+    z-index: 1;
+    background-color:rgba(255, 255, 255, 1);
+    border-radius:5px;;
+    -webkit-box-shadow: 9px 9px 17px -1px rgba(0,0,0,0.32);
+    border-style: solid;
+    border-color: rgba(170,170,170,.3);
+    border-width: 1px;
+}
+
 .navigation {
+    margin-bottom: 15px;
     text-align: center;
     color: LightGrey;
 }

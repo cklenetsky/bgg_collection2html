@@ -319,13 +319,26 @@ def write_output_header(config):
 
 def write_output_navigation(config, firstchars):
     with open(config.output, 'a') as file:
-        file.write('<h2 class="Navigation">')
+        file.write('''<script>
+window.onscroll = function() {scrollFunction()};
+
+function scrollFunction() {
+  if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+    document.getElementById("navbar").style.top = "0";
+  } else {
+    document.getElementById("navbar").style.top = "-50px";
+  }
+}
+</script>''')
+
+
+        file.write('<div id="navbar" style="top: -50px"><h2 class="Navigation">')
         for c, present in firstchars.items():
             if (present == 1):
                 file.write('&nbsp;<a class="Navigation_Link" href="#'+c+'">'+c+'</a>&nbsp; ')
             else:
                 file.write('&nbsp;'+c+'&nbsp; ')
-        file.write('</h2>\n')
+        file.write('</div></h2>\n')
 
 def request_collection(config):        
     logging.warning('Reading collection from bgg')
