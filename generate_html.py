@@ -462,7 +462,7 @@ def iterate_items(config, items, peritemfunc, peritemparam1=None, peritemparam2=
                 with open(collection_info.game_xml, 'r', encoding="utf-8") as file:
                     thisgameitems = ElementTree.fromstring(file.read())
             elif not (config.no_cache):
-                    logging.error('game not found')
+                    logging.info('game not found')
                     #Pull the game info XML
                     game_info_response = bgg_getter('thing', {'id': collection_info.obj_id, 'stats': 1} , config)
                 
@@ -585,7 +585,7 @@ if (config.generate_navigation):
                             thisgameitems=child
                             break
             elif not (config.no_cache):
-                    logging.error('game not found: ' + collection_info.game_xml)
+                    logging.info('game not found: ' + collection_info.game_xml)
                     #Pull the game info XML
                     game_info_response = bgg_getter('thing', {'id': collection_info.obj_id, 'stats': 1} , config)
     
@@ -627,7 +627,7 @@ for item in items:
                         thisgameitems=child
                         break
         elif not (config.no_cache):
-                logging.error('game not found')
+                logging.info('game not found')
                 #Pull the game info XML
                 game_info_response = bgg_getter('thing', {'id': collection_info.obj_id, 'stats': 1} , config)
 
