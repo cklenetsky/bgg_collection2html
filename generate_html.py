@@ -214,6 +214,7 @@ def template_to_output_entry(config, game_info, anchor):
     else:
         template = template.replace('{{image}}'     , os.path.join(config.images_path, game_info.obj_id + ".jpg") or "")
 
+    template = template.replace('{{BGGLink}}'       , "https://www.boardgamegeek.com/boardgame/" + game_info.obj_id)
     template = template.replace('{{GameName}}'      , game_info.name                            or "N/A")
     template = template.replace('{{Description}}'   , game_info.description                     or "N/A")
     template = template.replace('{{Published}}'     , game_info.published                       or "N/A")
