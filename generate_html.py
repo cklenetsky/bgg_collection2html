@@ -52,8 +52,12 @@ class collection_information:
         self.game_name  = item.find('name').text
         self.game_xml   = os.path.join(config.xml_path, self.obj_id + '.xml')
         self.own        = item.find('status').attrib['own'] == "1"
-        self.my_rating  = item.find('stats').find('rating').attrib['value']
-        self.avg_rating = item.find('stats').find('rating').find('average').attrib['value']
+        self.my_rating  = "N/A" 
+        self.avg_rating = 0.0 
+        stats_item = item.find('stats')
+        if stats_item is not None:
+            self.my_rating  = item.find('stats').find('rating').attrib['value']
+            self.avg_rating = item.find('stats').find('rating').find('average').attrib['value']
         self.my_image   = item.find('image').text if item.find('image') != None else ""
 
 class game_information:
@@ -345,6 +349,7 @@ def request_collection(config):
     logging.warning('Reading collection from bgg')
 
     status = 0
+    # Note: Something weird is going on with stats:1. I've seen cases where newly added games don't return
     params = {'username': config.user_name, 'stats': 1}
 
     if config.only_own:
