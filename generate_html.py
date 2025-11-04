@@ -21,6 +21,7 @@ class config:
     def __init__(self, args):
         self.LOGLEVEL                = os.environ.get('LOGLEVEL', 'INFO').upper()
         self.bgg                     = 'https://boardgamegeek.com/xmlapi2'
+        self.token                   = args.token
         self.successful_responses    = 0
         self.dict_player_count       = {}
         self.dict_category           = {}
@@ -108,13 +109,16 @@ def bgg_getter (command, params, config):
     sleep(.3)
     status = 0
     a = ''
+    headers = {
+        "Authorization": f"Bearer {config.token}"
+    }
     while not status == 200:
         url = '{}/{}?{}'.format(config.bgg,
                                 quote(command),
                                 urlencode(params),
                                 )
         logging.debug(url)
-        a = requests.get(url)
+        a = requests.get(url, headers=headers)
         status = a.status_code
         if(status != 200):
             error = ElementTree.fromstring(a.content)
@@ -151,6 +155,7 @@ def parse_arguments():
     parser.add_argument('--xml_path', dest='xml_path', action='store', default='', help='Game XML Path. (Default="./game_xml")')
     parser.add_argument('--collection_xml', dest='collection_xml', action='store', default='', help='Output collection XML file.(Default="./collection.xml")')
     parser.add_argument('--no_cache', dest='no_cache', action='store_true', help='Turn off all caching (default=Off)')
+    parser.add_argument('-t','--token', dest='token', action='store', default='', help='Application authorization token. (Required)')
     return parser.parse_args()
 
 def get_value(item):
@@ -245,6 +250,9 @@ def template_to_output_entry(config, game_info, anchor):
         file.write(template)
 
 def download_image(config, game_info):
+    headers = {
+        "Authorization": f"Bearer {config.token}"
+    }
     if not (config.no_cache):
         #If we have a local cache of the image, then don't try to redownload it, use the local copy.
         if(os.path.exists(os.path.join(config.images_path, game_info.obj_id + ".jpg")) == False):
@@ -252,7 +260,7 @@ def download_image(config, game_info):
             if (game_info.image is None):
                 logging.warning(game_info.name + " has no image url")
                 game_info.image = "https://cf.geekdo-images.com/zxVVmggfpHJpmnJY9j-k1w__imagepagezoom/img/RO6wGyH4m4xOJWkgv6OVlf6GbrA=/fit-in/1200x900/filters:no_upscale():strip_icc()/pic1657689.jpg"
-            res = requests.get(game_info.image, stream = True)
+            res = requests.get(game_info.image, headers=headers, stream = True)
             if res.status_code == 200:
                 logging.info("Writing: " + collection_info.game_name + " boxart to " + os.path.join(config.images_path, game_info.obj_id + ".jpg"))
                 with open(os.path.join(config.images_path, game_info.obj_id + ".jpg"), 'wb') as f:
@@ -343,7 +351,7 @@ function scrollFunction() {
                 file.write('&nbsp;<a class="Navigation_Link" href="#'+c+'">'+c+'</a>&nbsp; ')
             else:
                 file.write('&nbsp;'+c+'&nbsp; ')
-        file.write('</div></h2>\n')
+        file.write('</h2></div>\n')
 
 def request_collection(config):        
     logging.warning('Reading collection from bgg')
@@ -452,8 +460,9 @@ def write_index(config):
             file.write("</ul>\n")
 
 def write_output_trailer(config):
-    #Write the html trailer.
+    #Write the html trailer and the logo
     with open(config.output, 'a') as file:
+            file.write('<div class="logo_div"><a href="https://www.boardgamegeek.com"><img class="logo" src="./Images/powered_by_K_01_SM.png" alt="BGG logo"/></a></div>')
             file.write("</body></html>")
 
 

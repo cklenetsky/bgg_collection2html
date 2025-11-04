@@ -30,7 +30,21 @@
     border-color: rgba(170,170,170,.3);
     border-width: 1px;
     width:93%;
-} 
+}
+
+.logo_div {
+    position: fixed;
+    background-color: lightgrey;
+    bottom: 10px;
+    left: 10px;
+    box-shadow: 5px 5px 5px rgba(170,170,170,.3);
+    opacity: 0.75;
+    border-radius:10px;
+}
+
+.logo {
+    width: 200px;
+}
 
 .left_column {
     float:left;
