@@ -28,12 +28,10 @@ class config:
         self.dict_game_info           = {}
 
         self.user_name               = args.username
-        self.card_mode               = args.cardmode or False
         self.index                   = args.index    or False
         self.only_own                = args.own      or False
 
         self.template                = "./template.html"
-        self.card_template           = "./template_card.html"
 
         self.output                  = args.output if len(args.output) > 0 else"./output.html"
         self.collection_xml          = args.collection_xml if len(args.collection_xml) > 0 else"./collection.xml"
@@ -141,7 +139,6 @@ def bgg_getter (command, params, config):
 def parse_arguments():
     parser = argparse.ArgumentParser(description='Create html output of a board game collection based on UserName from boardgamegeek.com.')
     parser.add_argument('-u','--username', dest='username', action='store', default='', help='User to pull BGG collection data from. (Required)')
-    parser.add_argument('-c','--cardmode', dest='cardmode', action='store_true', help='Create cards instead of a catalog. (default=Off)')
     parser.add_argument('-i','--index', dest='index', action='store_true', help='Enables creating an index. (default=Off)')
     parser.add_argument('-n','--navigation', dest='navigation', action='store_true', help='Create alphabetical navigation links. (default=Off)')
     parser.add_argument('--clean_images', dest='clean_images', action='store_true', help='Clear out local images cache. (default=Off)')
@@ -187,24 +184,14 @@ def get_links(elem, name):
     return values
 
 def open_template(config):
-    if(config.card_mode):
-        with open(config.card_template, 'r') as file:
-            return file.read()
-    else:
-        with open(config.template, 'r') as file:
-            return file.read()
+    with open(config.template, 'r') as file:
+        return file.read()
 
 def get_mechanics_list_max_length(config):
-    if(config.card_mode):
-        return 65
-    else:
-        return 75
+    return 75
 
 def get_description_length(config):
-    if(config.card_mode):
-        return 450
-    else:
-        return 1000
+    return 1000
 
 def template_to_output_entry(config, game_info, anchor):
     mechanics_list_max_length = get_mechanics_list_max_length(config)
@@ -320,15 +307,9 @@ def clean_up(config):
 def write_output_header(config):
     with open(config.output, 'w') as file:      
         if(config.web_mode):
-            if(config.card_mode):
-                file.write('<html><head><link href="{{ url_for(\'static\', filename=\'styles/style_card.css\')}}" rel="stylesheet" type="text/css"></head><body>')
-            else:
-                file.write('<html><head><link href="{{ url_for(\'static\', filename=\'styles/style.css\')}}" rel="stylesheet" type="text/css"></head><body>')
+            file.write('<html><head><link href="{{ url_for(\'static\', filename=\'styles/style.css\')}}" rel="stylesheet" type="text/css"></head><body>')
         else:
-            if(config.card_mode):
-                file.write('<html><head><link href="style_card.css" rel="stylesheet" type="text/css"></head><body>')
-            else:
-                file.write('<html><head><link href="style.css" rel="stylesheet" type="text/css"></head><body>')
+            file.write('<html><head><link href="style.css" rel="stylesheet" type="text/css"></head><body>')
 
 def write_output_navigation(config, firstchars):
     with open(config.output, 'a') as file:
