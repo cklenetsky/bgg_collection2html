@@ -191,7 +191,7 @@ def get_mechanics_list_max_length(config):
     return 75
 
 def get_description_length(config):
-    return 1000
+    return 900 
 
 def template_to_output_entry(config, game_info, anchor):
     mechanics_list_max_length = get_mechanics_list_max_length(config)
@@ -335,7 +335,7 @@ function scrollFunction() {
         file.write('</h2></div>\n')
 
 def request_collection(config):        
-    logging.warning('Reading collection from bgg')
+    logging.info('Reading collection from bgg')
 
     status = 0
     # Note: Something weird is going on with stats:1. I've seen cases where newly added games don't return
@@ -353,7 +353,7 @@ def read_collection(config):
     if not (config.no_cache):
         #Check if collection.xml exists. If it does, read it.
         if(os.path.exists(config.collection_xml)):
-            logging.warning('Reading ' + config.collection_xml)
+            logging.info('Reading ' + config.collection_xml)
             with open(config.collection_xml, 'r', encoding="utf-8") as file:
                 return ElementTree.fromstring(file.read())
 
