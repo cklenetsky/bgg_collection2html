@@ -481,16 +481,6 @@ def parse_name_start(name):
                 return therest.lstrip()
     return name
 
-
-def determine_first_chars(collection_info, thisgameitems, config, firstchars):
-    if(collection_info.game_name is not None):
-        normalized_name = parse_name_start(collection_info.game_name)
-        c = normalized_name[0]
-        if (c.isdigit()):
-            c = '0'
-        firstchars[c] = 1 
-
-
 def write_game_info(collection_info, thisgameitems, config, towrite):
     if(thisgameitems.attrib['type'] == "boardgame"):
         game_info = game_information(thisgameitems, config, collection_info)
