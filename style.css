@@ -193,7 +193,7 @@
     float:left;
     font-size:calc(18px + (.1vh + 1vw));
     line-height: calc(18px + (.1vh + 1vw));
-    background-color:rgba(255, 255, 255, 0.55);
+    background-color:rgba(255, 255, 255, 0.70);
     border-radius:5px;;
     font-family: 'David Libre', serif;
     box-shadow: 9px 9px 17px -1px rgba(0,0,0,0.32);
@@ -232,7 +232,7 @@
     float:left;
     display: flex;
 
-    background-color:rgba(255, 255, 255, 0.55);
+    background-color:rgba(255, 255, 255, 0.70);
     border-radius:5px;
     
     font-size:calc(18px + .6vh);
@@ -288,7 +288,7 @@
     padding-right:15px;
     padding-left:15px;
     border-radius:5px;
-    background-color:rgba(255, 255, 255, 0.55);
+    background-color:rgba(255, 255, 255, 0.70);
     box-shadow: 9px 9px 17px -1px rgba(0,0,0,0.32);
     -webkit-box-shadow: 9px 9px 17px -1px rgba(0,0,0,0.32);
     -moz-box-shadow: 9px 9px 17px -1px rgba(0,0,0,0.32);
@@ -324,7 +324,7 @@
     border-radius:5px;;
     padding-top:5px;
     padding-bottom:5px;
-    background-color:rgba(255, 255, 255, 0.55);
+    background-color:rgba(255, 255, 255, 0.70);
     
     box-shadow: 9px 9px 17px -1px rgba(0,0,0,0.32);
     -webkit-box-shadow: 9px 9px 17px -1px rgba(0,0,0,0.32);
