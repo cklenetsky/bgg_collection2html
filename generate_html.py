@@ -486,7 +486,7 @@ def write_game_info(collection_info, thisgameitems, config, towrite):
     if(thisgameitems.attrib['type'] == "boardgame"):
         game_info = game_information(thisgameitems, config, collection_info)
         normalized_name = parse_name_start(game_info.name)
-        newfirstchar = normalized_name[0]
+        newfirstchar = normalized_name[0].upper()
         anchor = ""
         if (newfirstchar.isdigit()):
             newfirstchar = '0'
@@ -590,7 +590,7 @@ if (config.generate_navigation):
     
             #Now that we have all of the information we need, create the HTML page.
             if(collection_info.game_name is not None):
-                normalized_name = parse_name_start(collection_info.game_name)
+                normalized_name = parse_name_start(collection_info.game_name).upper()
                 c = normalized_name[0]
                 if (c.isdigit()):
                     c = '0'
@@ -634,7 +634,7 @@ for item in items:
         if(thisgameitems.attrib['type'] == "boardgame"):
             game_info = game_information(thisgameitems, config, collection_info)
             normalized_name = parse_name_start(game_info.name)
-            newfirstchar = normalized_name[0]
+            newfirstchar = normalized_name[0].upper()
             anchor = ""
             if (newfirstchar.isdigit()):
                 newfirstchar = '0'
