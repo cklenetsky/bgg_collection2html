@@ -31,7 +31,7 @@ class config:
         self.index                   = args.index    or False
         self.only_own                = args.own      or False
 
-        self.template                = "./template.html"
+        self.template                = args.template if len(args.template) > 0 else "./template.html"
 
         self.output                  = args.output if len(args.output) > 0 else"./output.html"
         self.collection_xml          = args.collection_xml if len(args.collection_xml) > 0 else"./collection.xml"
@@ -153,6 +153,7 @@ def parse_arguments():
     parser.add_argument('--collection_xml', dest='collection_xml', action='store', default='', help='Output collection XML file.(Default="./collection.xml")')
     parser.add_argument('--no_cache', dest='no_cache', action='store_true', help='Turn off all caching (default=Off)')
     parser.add_argument('-t','--token', dest='token', action='store', default='', help='Application authorization token. (Required)')
+    parser.add_argument('-T','--template', dest='template', action='store', default='', help='Template file to use. (Default="./template.html")')
     return parser.parse_args()
 
 def get_value(item):
@@ -485,7 +486,7 @@ def write_game_info(collection_info, thisgameitems, config, towrite):
     if(thisgameitems.attrib['type'] == "boardgame"):
         game_info = game_information(thisgameitems, config, collection_info)
         normalized_name = parse_name_start(game_info.name)
-        newfirstchar = normalized_name[0]
+        newfirstchar = normalized_name[0].upper()
         anchor = ""
         if (newfirstchar.isdigit()):
             newfirstchar = '0'
@@ -589,7 +590,7 @@ if (config.generate_navigation):
     
             #Now that we have all of the information we need, create the HTML page.
             if(collection_info.game_name is not None):
-                normalized_name = parse_name_start(collection_info.game_name)
+                normalized_name = parse_name_start(collection_info.game_name).upper()
                 c = normalized_name[0]
                 if (c.isdigit()):
                     c = '0'
@@ -633,7 +634,7 @@ for item in items:
         if(thisgameitems.attrib['type'] == "boardgame"):
             game_info = game_information(thisgameitems, config, collection_info)
             normalized_name = parse_name_start(game_info.name)
-            newfirstchar = normalized_name[0]
+            newfirstchar = normalized_name[0].upper()
             anchor = ""
             if (newfirstchar.isdigit()):
                 newfirstchar = '0'
